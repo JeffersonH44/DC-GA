@@ -15,7 +15,7 @@
 class GaussianMutator : public Operator<std::vector<double>> {
 public:
     GaussianMutator(double mean, double std, double prob);
-    std::vector<double> apply(std::vector<std::vector<double>> individuals);
+    std::vector<std::vector<double>> apply(std::vector<std::vector<double>> individuals);
 private:
     double prob;
     std::random_device rd;

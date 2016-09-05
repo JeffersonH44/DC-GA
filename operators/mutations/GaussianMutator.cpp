@@ -14,7 +14,7 @@ GaussianMutator::GaussianMutator(double mean, double std, double prob) :
     this->arguments = 1;
 }
 
-std::vector<double> GaussianMutator::apply(std::vector<std::vector<double>> individuals) {
+std::vector<std::vector<double>> GaussianMutator::apply(std::vector<std::vector<double>> individuals) {
     std::vector<double> ind = individuals[0];
     std::vector<double> newInd(ind);
     double rand;
@@ -26,5 +26,8 @@ std::vector<double> GaussianMutator::apply(std::vector<std::vector<double>> indi
         }
     }
 
-    return newInd;
+    std::vector<std::vector<double>> toReturn;
+    toReturn.push_back(newInd);
+
+    return toReturn;
 }

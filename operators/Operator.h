@@ -10,7 +10,7 @@
 template <class T>
 class Operator {
 public:
-    virtual T apply(std::vector<T> individuals) = 0;
+    virtual std::vector<T> apply(std::vector<T> individuals) = 0;
     int getArguments();
 protected:
     int arguments;
