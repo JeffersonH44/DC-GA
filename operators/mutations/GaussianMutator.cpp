@@ -20,7 +20,6 @@ std::vector<std::vector<double>> GaussianMutator::apply(std::vector<std::vector<
     double rand;
     for(size_t i = 0; i < ind.size(); ++i) {
         rand = ur.generate();
-        std::cout << rand << " " << this->prob << std::endl;
         if(rand < this->prob) {
             newInd[i] = ind[i] + gr.generate();
         }
