@@ -9,7 +9,7 @@
 #include <cmath>
 #include "OptimizationFunction.h"
 
-class Rastrigin : public OptimizationFunction<std::vector<double>>{
+class Rastrigin : public OptimizationFunction<std::vector<double> >{
 public:
     Rastrigin(bool minimize);
     Rastrigin(double objective);

@@ -30,7 +30,7 @@ std::vector<double> Hipercube::repair(std::vector<double> val) {
 
 std::vector<double> Hipercube::getRandomIndividual() {
     size_t dimensions = min.size();
-    std::vector individual(dimensions, 0.0);
+    std::vector<double> individual(dimensions, 0.0);
     for(size_t i = 0 ; i < dimensions; ++i) {
         individual[i] = ur.generate();
     }
