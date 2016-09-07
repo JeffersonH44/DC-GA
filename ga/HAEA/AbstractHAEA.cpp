@@ -68,15 +68,58 @@ std::vector<T> AbstractHAEA::solve(Space<T> space, OptimizationFunction<T> goal)
 
     this->initPopulation();
     for(int i = 0; i < this->maxIters; ++i) {
+        std::vector<T> new_population;
         for(int j = 0; j < this->populationSize; ++j) {
-            T individual = this->population[j];
+            T parent = this->population[j];
+            double delta = this->ur.generate();
 
             std::vector<double> rates = this->operatorRates[i];
             int operatorIndex = this->operatorSelect(rates);
             Operator<T> op = this->operators[operatorIndex];
             int args = op.getArguments();
 
-            double parentFitness = this->optimizationFunction.apply(individual);
+            double parentFitness = this->optimizationFunction.apply(parent);
+            std::vector<T> selectedIndividuals;
+            selectedIndividuals.push_back(parent);
+            for(int k = 1; k < args; ++k) {
+                // TODO: selection of the other individuals
+                // TODO: for now we select it randomly
+                int index = -1;
+                do {
+                    index = static_cast<int>(this->randomIndividual.generate());
+                } while(index != j);
+
+                selectedIndividuals.push_back(this->population[index]);
+            }
+
+            std::vector<T> offspring = op.apply(selectedIndividuals);
+            double childFitness = std::numeric_limits<double>::max();
+            T child;
+            if(offspring.size() > 1) {
+                for(auto ind = offspring.begin(); ind != offspring.end(); ++ind){
+                    double currentFitness = this->optimizationFunction.apply(*ind);
+                    if(currentFitness < childFitness) {
+                        childFitness = currentFitness;
+                        child = *ind;
+                    }
+                }
+            } else {
+                child = offspring[0];
+                childFitness = this->optimizationFunction.apply(child);
+            }
+
+            if(childFitness < parentFitness) {
+                rates[operatorIndex] *= (1.0 + delta);
+            } else {
+                rates[operatorIndex] *= (1.0 - delta);
+            }
+
+            this->ratesNormalize(rates);
+
+            new_population.push_back(child);
         }
+        this->population = new_population;
     }
+
+    return this->population;
 }
