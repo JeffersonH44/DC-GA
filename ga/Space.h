@@ -11,6 +11,7 @@ template <class T>
 class Space {
 public:
     virtual T repair(T val) = 0;
+    virtual T getRandomIndividual() = 0;
     std::vector<T> repair(std::vector<T> population);
 };
 

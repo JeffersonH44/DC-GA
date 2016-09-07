@@ -7,15 +7,18 @@
 
 #include <vector>
 #include <cmath>
-#include "../ga/OptimizationFunction.h"
+#include "OptimizationFunction.h"
 
 class Rastrigin : public OptimizationFunction<std::vector<double>>{
 public:
+    Rastrigin(bool minimize);
+    Rastrigin(double objective);
     Rastrigin();
     double apply(std::vector<double> ind);
     double apply(double val);
 
 private:
+    double objective;
 };
 
 

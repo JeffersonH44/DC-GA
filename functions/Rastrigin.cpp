@@ -3,6 +3,7 @@
 //
 
 #include <cstddef>
+#include <limits>
 #include "Rastrigin.h"
 
 double Rastrigin::apply(double val) {
@@ -17,9 +18,22 @@ double Rastrigin::apply(std::vector<double> ind) {
         fitness += this->apply(ind[i]);
     }
 
-    return 10.0 * len + fitness;
+    fitness = 10.0 * len + fitness;
+
+    return std::abs(this->objective - fitness);
 }
 
-Rastrigin::Rastrigin() {
 
+// TODO: be careful with the max double
+Rastrigin::Rastrigin(bool minimize) {
+    this->objective = minimize ? 0.0 : std::numeric_limits<double>::max();
+}
+
+Rastrigin::Rastrigin(double objective) {
+    this->objective = objective;
+}
+
+Rastrigin::Rastrigin() :
+Rastrigin(true)
+{
 }
