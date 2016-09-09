@@ -14,22 +14,24 @@ using namespace std;
 typedef mt19937 base_generator_type;
 
 int main() {
-    size_t ITERS = 200;
-    size_t DIM = 10;
+    size_t ITERS = 500;
+    size_t POP = 100;
+    size_t DIM = 20;
+    size_t THREADS = 8;
 
-    Hipercube space(-5.12, 5.12, 10);
+    Hipercube space(-5.12, 5.12, DIM);
     Rastrigin optimizationFunction;
 
     vector< shared_ptr<Operator<vector<double> > > > opers;
     opers.push_back(make_shared<GaussianMutator>(0.0, 0.3, 0.1));
     opers.push_back(make_shared<LinearXOver>());
 
-    AbstractHAEA<vector<double>> search(opers, DIM, ITERS);
+    AbstractHAEA<vector<double>> search(opers, POP, ITERS);
 
     double rmean = 0.0;
 
     for(int k = 0; k < 30; ++k) {
-        vector<vector<double> > result = search.solve(&space, &optimizationFunction);
+        vector<vector<double> > result = search.solve(&space, &optimizationFunction, THREADS);
         double mean = 0.0;
 
         for(size_t i = 0; i < result.size(); ++i) {
@@ -44,22 +46,6 @@ int main() {
     }
 
     cout << "mean: " << rmean / 30.0 << endl;
-
-
-    /*vector<double> ind = space.getRandomIndividual();
-
-    for(size_t i = 0; i < 10; ++i) {
-        cout << ind[i] << endl;
-    }
-    vector<vector<double> > inds;
-    inds.push_back(ind);
-
-    inds = opers[0]->apply(inds);
-
-    cout << endl;
-    for(size_t i = 0; i < 10; ++i) {
-        cout << inds[0][i] << endl;
-    }*/
 
     return 0;
 }

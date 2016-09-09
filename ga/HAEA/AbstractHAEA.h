@@ -9,6 +9,7 @@
 #include <vector>
 #include <random>
 #include <memory>
+#include <pthread.h>
 
 #include "../../random/UniformRandomInt.h"
 #include "../Space.h"
@@ -20,7 +21,9 @@ template <class T>
 class AbstractHAEA {
 public:
     AbstractHAEA(std::vector< std::shared_ptr<Operator<T> > > operators, size_t populationSize, size_t maxIters);
-    //virtual void iteration() = 0;
+    static void *iteration(void *instance);
+
+    pthread_barrier_t pthreadBarrier;
 
     std::random_device rd;
     std::mt19937 eng;
@@ -32,7 +35,7 @@ public:
     OptimizationFunction<T> *optimizationFunction;
 
     size_t populationSize;
-    std::vector<T> population;
+    std::vector<T> population, new_population;
 
     size_t maxIters;
 
@@ -41,9 +44,16 @@ public:
 
     void ratesNormalize(std::vector<double> &operatorRates);
     size_t operatorSelect(std::vector<double> rates);
-    std::vector<T> solve(Space<T> *space, OptimizationFunction<T> *goal);
+    std::vector<T> solve(Space<T> *space, OptimizationFunction<T> *goal, size_t threads);
 private:
     void initPopulation();
+};
+
+template <class T>
+struct thread_args {
+    AbstractHAEA<T> *solver;
+    size_t from;
+    size_t to;
 };
 
 template <class T>
@@ -102,7 +112,8 @@ AbstractHAEA<T>::AbstractHAEA(std::vector< std::shared_ptr<Operator<T> > > opera
         eng(rd()),
         randomOperator(eng, 0, static_cast<int>(operators.size()) - 1),
         randomIndividual(eng, 0, static_cast<int>(populationSize - 1)),
-        ur(eng, 0.0, 1.0)
+        ur(eng, 0.0, 1.0),
+        new_population(populationSize)
 {
     this->operators = operators;
     this->maxIters = maxIters;
@@ -110,42 +121,95 @@ AbstractHAEA<T>::AbstractHAEA(std::vector< std::shared_ptr<Operator<T> > > opera
 }
 
 template <class T>
-std::vector<T> AbstractHAEA<T>::solve(Space<T> *space, OptimizationFunction<T> *goal) {
+std::vector<T> AbstractHAEA<T>::solve(Space<T> *space, OptimizationFunction<T> *goal, size_t threads) {
     this->space = space;
     this->optimizationFunction = goal;
 
     this->initPopulation();
-    for(size_t i = 0; i < this->maxIters; ++i) {
-        std::vector<T> new_population;
-        for(size_t j = 0; j < this->populationSize; ++j) {
-            T parent = this->population[j];
-            double delta = this->ur.generate();
 
-            std::vector<double> rates = this->operatorRates[j];
-            size_t operatorIndex = this->operatorSelect(rates);
-            std::shared_ptr< Operator<T> > op = this->operators[operatorIndex];
-            int args = op->getArguments();
+    std::vector<pthread_t> thread(threads);
+    std::vector<thread_args<T>> t_args(threads);
 
-            double parentFitness = this->optimizationFunction->apply(parent);
+    size_t batch = threads < this->populationSize ? (this->populationSize / threads) : this->populationSize;
+    size_t from = 0;
+    size_t to = from + batch;
+    pthread_barrier_init(&this->pthreadBarrier, 0, static_cast<unsigned int>(threads));
+
+    for(size_t i = 0; i < threads; ++i) {
+        if(i + 1 == threads) to = this->populationSize;
+        t_args[i] = {this, from, to};
+        //t_args.solver = *this;
+        //t_args.to = to;
+        //t_args.from = from;
+
+        int ret = pthread_create(&thread[i], NULL, iteration, &t_args[i]);
+        if(ret != 0) {
+            printf("Error: pthread_create() failed\n");
+            exit(EXIT_FAILURE);
+        }
+
+        from = to;
+        to += batch;
+    }
+
+    void *status;
+    for(size_t i = 0; i < threads; ++i) {
+        int ret = pthread_join(thread[i], &status);
+        if(ret != 0) {
+            printf("Error: pthread_join() failed\n");
+            exit(EXIT_FAILURE);
+        }
+    }
+    pthread_barrier_destroy(&this->pthreadBarrier);
+
+    return this->population;
+}
+
+template <class T>
+void *AbstractHAEA<T>::iteration(void *instance) {
+    thread_args<T> *args = static_cast<thread_args<T>*>(instance);
+    AbstractHAEA<T> *solver = args->solver;
+    size_t from = args->from;
+    size_t to = args->to;
+    //printf("%li %li\n", from, to);
+
+    for(size_t i = 0; i < solver->maxIters; ++i) {
+        //printf("%li %li\n", from, to);
+        for(size_t j = from; j < to; ++j) {
+            T parent = solver->population[j];
+            double delta = solver->ur.generate();
+
+            std::vector<double> rates = solver->operatorRates[j];
+            size_t operatorIndex = solver->operatorSelect(rates);
+            std::shared_ptr< Operator<T> > op = solver->operators[operatorIndex];
+            int arguments = op->getArguments();
+
+            double parentFitness = solver->optimizationFunction->apply(parent);
             std::vector<T> selectedIndividuals;
             selectedIndividuals.push_back(parent);
-            for(int k = 1; k < args; ++k) {
+            for(int k = 1; k < arguments; ++k) {
                 // TODO: selection of the other individuals
                 // TODO: for now we select it randomly
                 size_t index = 0;
                 do {
-                    index = static_cast<size_t>(this->randomIndividual.generate());
+                    index = static_cast<size_t>(solver->randomIndividual.generate());
                 } while(index == j);
-
-                selectedIndividuals.push_back(this->population[index]);
+                //printf("index : %i\n", static_cast<int>(index));
+                selectedIndividuals.push_back(solver->population[index]);
             }
 
             std::vector<T> offspring = op->apply(selectedIndividuals);
+
+            // repair offspring
+            for(size_t k = 0; k < offspring.size(); ++k) {
+                offspring[k] = solver->space->repair(offspring[k]);
+            }
+
             double childFitness = std::numeric_limits<double>::max();
             T child;
             if(offspring.size() > 1) {
                 for(auto ind = offspring.begin(); ind != offspring.end(); ++ind){
-                    double currentFitness = this->optimizationFunction->apply(*ind);
+                    double currentFitness = solver->optimizationFunction->apply(*ind);
                     if(currentFitness < childFitness) {
                         childFitness = currentFitness;
                         child = *ind;
@@ -153,7 +217,7 @@ std::vector<T> AbstractHAEA<T>::solve(Space<T> *space, OptimizationFunction<T> *
                 }
             } else {
                 child = offspring[0];
-                childFitness = this->optimizationFunction->apply(child);
+                childFitness = solver->optimizationFunction->apply(child);
             }
 
             if(childFitness < parentFitness) {
@@ -162,14 +226,20 @@ std::vector<T> AbstractHAEA<T>::solve(Space<T> *space, OptimizationFunction<T> *
                 rates[operatorIndex] *= (1.0 - delta);
             }
 
-            this->ratesNormalize(rates);
+            solver->ratesNormalize(rates);
 
-            new_population.push_back(child);
+            solver->new_population[j] = child;
         }
-        this->population = new_population;
-    }
+        pthread_barrier_wait(&solver->pthreadBarrier);
 
-    return this->population;
+        if(from == 0) {
+            solver->population = solver->new_population;
+            //printf("unlock \n");
+        }
+        pthread_barrier_wait(&solver->pthreadBarrier);
+        // solver.population = new_population;
+    }
+    return nullptr;
 }
 
 #endif //HOLA_ABSTRACTHAEA_H
