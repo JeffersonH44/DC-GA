@@ -8,24 +8,25 @@
 #include "random/UniformRandomInt.h"
 #include "random/GaussianRandom.h"
 #include "operators/mutations/GaussianMutator.h"
+#include "operators/xover/LinearXOver.h"
 
 using namespace std;
 
 // Main routine that executes on the host
 int main() {
-    thrust::host_vector< thrust::device_vector<double> > individuals, result;
-    thrust::device_vector<double> ind(1000, 1.0);
+    thrust::host_vector< thrust::device_vector<double> > individuals;
+    thrust::device_vector<double> ind(1000, 1.0), ind1(1000, 3.5);
     individuals.push_back(ind);
+    individuals.push_back(ind1);
 
-    GaussianMutator gm(0.0, 1.0, 10.0/50.0);
-    for(int i = 0; i < 1000; ++i) {
-        result = gm.apply(individuals);
-        individuals = thrust::host_vector< thrust::device_vector<double> >(result.begin(), result.end());
+    LinearXOver lx;
+    for(int i = 0; i < 2; ++i) {
+        individuals = lx.apply(individuals);
     }
 
 
     for(size_t i = 0; i < ind.size(); ++i) {
-        cout << individuals[0][i] << " ";
+        cout << individuals[0][i] << " " << individuals[1][i] << endl;
     }
 
     return 0;

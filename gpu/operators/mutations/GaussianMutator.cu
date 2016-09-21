@@ -14,7 +14,7 @@ GaussianMutator::GaussianMutator(double mean, double std, double prob) :
     this->arguments = 1;
 }
 
-thrust::host_vector< thrust::device_vector<double> > GaussianMutator::apply(thrust::host_vector< thrust::device_vector<double> > individuals) {
+thrust::host_vector< thrust::device_vector<double> > GaussianMutator::apply(thrust::host_vector< thrust::device_vector<double> > &individuals) {
     thrust::device_vector<double> newInd(individuals[0].begin(), individuals[0].end());
     thrust::device_vector<double> probs = ur.generate(static_cast<int>(newInd.size()));
     thrust::device_vector<double> mutation = gr.generate(static_cast<int>(newInd.size()));
