@@ -12,7 +12,7 @@ using namespace std;
 
 // Main routine that executes on the host
 int main() {
-    GaussianRandom r(5.0, 1.0);
+    UniformRandom r(0.0, 10.0);
 
     for(int j = 0 ; j < 2; ++j) {
         thrust::device_vector<double> res = r.generate(5 + j*5);

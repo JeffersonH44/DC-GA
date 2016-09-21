@@ -21,18 +21,20 @@
 
 struct prg_real
 {
-    double a, b;
+    thrust::uniform_real_distribution<double> dist;
+    unsigned int seed;
 
     __host__ __device__
-    prg_real(double _a=0.0, double _b=1.0) : a(_a), b(_b) {};
+    prg_real(unsigned int seed, double _a=0.0, double _b=1.0) :
+            dist(_a, _b),
+            seed(seed)
+    {};
 
     __host__ __device__
-    double operator()(const unsigned int n) const
+    double operator()(const unsigned int n)
     {
-        thrust::default_random_engine rng;
-        thrust::uniform_real_distribution<double> dist(a, b);
+        thrust::default_random_engine rng(seed);
         rng.discard(n);
-
         return dist(rng);
     }
 };
@@ -43,7 +45,7 @@ public:
     thrust::device_vector<double> generate(int n);
 
 private:
-    prg_real rand;
+    double a, b;
 };
 
 

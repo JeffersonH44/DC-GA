@@ -13,18 +13,20 @@
 
 struct prg_int
 {
-    int a, b;
+    thrust::uniform_int_distribution<int> dist;
+    unsigned int seed;
 
     __host__ __device__
-    prg_int(int _a=0, int _b=1) : a(_a), b(_b) {};
+    prg_int(unsigned int seed, int _a=0, int _b=1) :
+            dist(_a, _b),
+            seed(seed)
+    {};
 
     __host__ __device__
-    double operator()(const unsigned int n) const
+    double operator()(const unsigned int n)
     {
-        thrust::default_random_engine rng;
-        thrust::uniform_int_distribution<int> dist(a, b);
+        thrust::default_random_engine rng(seed);
         rng.discard(n);
-
         return dist(rng);
     }
 };
@@ -35,7 +37,7 @@ public:
     thrust::device_vector<double> generate(int n);
 
 private:
-    prg_int rand;
+    int a, b;
 };
 
 #endif //HOLA_UNIFORMRANDOMINT_H

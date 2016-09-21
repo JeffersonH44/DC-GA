@@ -7,7 +7,7 @@
 
 
 UniformRandomInt::UniformRandomInt(int a, int b) :
-        rand(a, b)
+        a(a), b(b)
 {
 }
 
@@ -18,7 +18,7 @@ thrust::device_vector<double> UniformRandomInt::generate(int n) {
     thrust::transform(index_sequence_begin,
                       index_sequence_begin + n,
                       result.begin(),
-                      this->rand);
+                      prg_int(static_cast<unsigned int>(rand()), a, b));
 
     return result;
 }

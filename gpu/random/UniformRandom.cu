@@ -10,7 +10,7 @@
 #include <thrust/iterator/counting_iterator.h>
 
 UniformRandom::UniformRandom(double a, double b) :
-    rand(a, b)
+    a(a), b(b)
 {
 }
 
@@ -21,7 +21,7 @@ thrust::device_vector<double> UniformRandom::generate(int n) {
     thrust::transform(index_sequence_begin,
                       index_sequence_begin + n,
                       result.begin(),
-                      this->rand);
+                      prg_real(static_cast<unsigned int>(rand()), a, b));
 
     return result;
 }

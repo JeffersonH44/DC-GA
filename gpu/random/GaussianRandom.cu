@@ -4,7 +4,6 @@
 
 #include "GaussianRandom.h"
 #include <random>
-#include <iostream>
 
 GaussianRandom::GaussianRandom(double mean, double std) :
         mean(mean),
@@ -17,7 +16,6 @@ thrust::device_vector<double> GaussianRandom::generate(int n) {
     thrust::device_vector<double> result(static_cast<unsigned long>(n));
     thrust::counting_iterator<unsigned int> index_sequence_begin(0);
     unsigned int seed = static_cast<unsigned int>(rand());
-    std::cout << seed << std::endl;
 
     thrust::transform(index_sequence_begin,
                       index_sequence_begin + n,
