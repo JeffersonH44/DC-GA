@@ -6,12 +6,16 @@
 #define HOLA_SELECTION_H
 
 #include <vector>
+#include <cstddef>
+#include "../functions/OptimizationFunction.h"
 
 template <class T>
 class Selection {
 public:
-    virtual int chooseOne(std::vector<T> population) = 0;
-    std::vector<int> chooseElements(int n, std::vector<T> population);
+    virtual size_t chooseOne(std::vector<T> population) = 0;
+
+protected:
+    OptimizationFunction<T> *function;
 };
 
 

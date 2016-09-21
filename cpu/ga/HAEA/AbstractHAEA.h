@@ -16,11 +16,12 @@
 #include "../../functions/OptimizationFunction.h"
 #include "../../operators/Operator.h"
 #include "../../random/UniformRandom.h"
+#include "../../selection/Selection.h"
 
 template <class T>
 class AbstractHAEA {
 public:
-    AbstractHAEA(std::vector< std::shared_ptr<Operator<T> > > operators, size_t populationSize, size_t maxIters);
+    AbstractHAEA(Selection<T> &selection, std::vector< std::shared_ptr<Operator<T> > > operators, size_t populationSize, size_t maxIters);
     static void *iteration(void *instance);
 
     pthread_barrier_t pthreadBarrier;
@@ -41,6 +42,8 @@ public:
 
     std::vector< std::vector<double> > operatorRates;
     std::vector< std::shared_ptr<Operator<T> > > operators;
+
+    Selection<T> *selection;
 
     void ratesNormalize(std::vector<double> &operatorRates);
     size_t operatorSelect(std::vector<double> rates);
@@ -108,7 +111,7 @@ void AbstractHAEA<T>::initPopulation() {
 }
 
 template <class T>
-AbstractHAEA<T>::AbstractHAEA(std::vector< std::shared_ptr<Operator<T> > > operators, size_t populationSize, size_t maxIters) :
+AbstractHAEA<T>::AbstractHAEA(Selection<T> &selection, std::vector< std::shared_ptr<Operator<T> > > operators, size_t populationSize, size_t maxIters) :
         eng(rd()),
         randomOperator(eng, 0, static_cast<int>(operators.size()) - 1),
         randomIndividual(eng, 0, static_cast<int>(populationSize - 1)),
@@ -118,6 +121,7 @@ AbstractHAEA<T>::AbstractHAEA(std::vector< std::shared_ptr<Operator<T> > > opera
     this->operators = operators;
     this->maxIters = maxIters;
     this->populationSize = populationSize;
+    this->selection = &selection;
 }
 
 template <class T>
@@ -191,9 +195,7 @@ void *AbstractHAEA<T>::iteration(void *instance) {
                 // TODO: selection of the other individuals
                 // TODO: for now we select it randomly
                 size_t index = 0;
-                do {
-                    index = static_cast<size_t>(solver->randomIndividual.generate());
-                } while(index == j);
+                index = static_cast<size_t>(solver->selection->chooseOne(solver->population));
                 //printf("index : %i\n", static_cast<int>(index));
                 selectedIndividuals.push_back(solver->population[index]);
             }
