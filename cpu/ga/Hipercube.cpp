@@ -3,6 +3,7 @@
 //
 
 #include <cstddef>
+#include <thrust/device_vector.h>
 #include "Hipercube.h"
 
 
