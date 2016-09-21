@@ -7,19 +7,25 @@
 #include "random/UniformRandom.h"
 #include "random/UniformRandomInt.h"
 #include "random/GaussianRandom.h"
+#include "operators/mutations/GaussianMutator.h"
 
 using namespace std;
 
 // Main routine that executes on the host
 int main() {
-    UniformRandom r(0.0, 10.0);
+    thrust::host_vector< thrust::device_vector<double> > individuals, result;
+    thrust::device_vector<double> ind(1000, 1.0);
+    individuals.push_back(ind);
 
-    for(int j = 0 ; j < 2; ++j) {
-        thrust::device_vector<double> res = r.generate(5 + j*5);
-        for(size_t i = 0; i < res.size(); ++i) {
-            cout << res[i] << endl;
-        }
-        cout << endl;
+    GaussianMutator gm(0.0, 1.0, 10.0/50.0);
+    for(int i = 0; i < 1000; ++i) {
+        result = gm.apply(individuals);
+        individuals = thrust::host_vector< thrust::device_vector<double> >(result.begin(), result.end());
+    }
+
+
+    for(size_t i = 0; i < ind.size(); ++i) {
+        cout << individuals[0][i] << " ";
     }
 
     return 0;
