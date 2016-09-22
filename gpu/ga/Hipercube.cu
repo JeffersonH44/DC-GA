@@ -20,5 +20,5 @@ thrust::device_vector<double> Hipercube::repair(thrust::device_vector<double> va
 }
 
 thrust::device_vector<double> Hipercube::getRandomIndividual() {
-    return ur.generate(this->dimension);
+    return (ur.generate(this->dimension));
 }

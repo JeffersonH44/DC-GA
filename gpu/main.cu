@@ -25,28 +25,26 @@ void test();
 
 // Main routine that executes on the host
 int main() {
-    Hipercube space(-5.12, 5.12, static_cast<int>(1000));
+    Hipercube space(-5.12, 5.12, static_cast<int>(100000));
 
+    cout << "here" << endl;
+    std::vector< thrust::device_vector<double> > elem;
+    cout << "here" << endl;
+    for(int i = 0; i < 100; ++i) {
+        cout << "here1" << endl;
+        elem.push_back(space.getRandomIndividual());
+        cout << "here2" << endl;
+    }
     Rastrigin optimizationFunction;
+    cout << "here" << endl;
     Tournament selection(optimizationFunction, 4);
+    cout << "here" << endl;
 
-    std::shared_ptr<Operator<thrust::device_vector<double> > > lxo = std::make_shared<LinearXOver>(), gm = std::make_shared<GaussianMutator>(0.0, 0.3, 0.1);
+    //std::shared_ptr<Operator<thrust::device_vector<double> > > lxo = std::make_shared<LinearXOver>(), gm = std::make_shared<GaussianMutator>(0.0, 0.3, 0.1);
 
-
-    thrust::host_vector< std::shared_ptr<Operator<thrust::device_vector<double> > > > opers(2);
-    opers[0] = lxo;
-    cout << "hello1" << endl;
-    opers[1] = gm;
-    cout << "hello1" << endl;
-
-    AbstractHAEA<thrust::device_vector<double>> search(selection, opers, 100, 1000);
-
-    cout << "instance" << endl;
-
-    try {
-        thrust::host_vector<thrust::device_vector<double>> solutions = search.solve(&space, &optimizationFunction);
-    } catch(thrust::system_error e) {
-        cerr << "Error: " << e.what() << " " << e.code() << endl;
+    for(int i = 0; i < 1000; ++i) {
+        cout << i << endl;
+        selection.chooseOne(elem);
     }
 
 
