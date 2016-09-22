@@ -1,19 +1,18 @@
 //
-// Created by jefferson on 15/09/16.
+// Created by jefferson on 21/09/16.
 //
 
-#include <thrust/system/cuda/detail/bulk.h>
 #include "Tournament.h"
-#include "../random/UniformRandomInt.h"
+#include "../../cpu/random/UniformRandomInt.h"
 
-Tournament::Tournament(OptimizationFunction<std::vector<double> > &function, int n) :
+Tournament::Tournament(OptimizationFunction<thrust::device_vector<double> > &function, int n) :
     eng(rd())
 {
     this->function = &function;
     this->n = n;
 }
 
-size_t Tournament::chooseOne(std::vector<std::vector<double>> population) {
+size_t Tournament::chooseOne(thrust::host_vector< thrust::device_vector<double> > population) {
     UniformRandomInt index(this->eng, 0, static_cast<int>(population.size()) - 1);
 
     double fitness = std::numeric_limits<double>::max();

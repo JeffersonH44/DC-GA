@@ -10,6 +10,7 @@ set(SOURCE_FILES_NVCC main.cu functions/Rastrigin.cu functions/Rastrigin.h rando
         random/UniformRandomInt.h random/GaussianRandom.cu random/GaussianRandom.h operators/Operator.cu
         operators/Operator.h operators/mutations/GaussianMutator.cu operators/mutations/GaussianMutator.h
         operators/xover/LinearXOver.cu operators/xover/LinearXOver.h ga/Hipercube.cu ga/Hipercube.h
-        ga/Space.cu ga/Space.h)
+        ga/Space.cu ga/Space.h selection/Selection.cu selection/Selection.h selection/Tournament.cu
+        selection/Tournament.h)
 
 cuda_add_executable(gpu ${SOURCE_FILES_NVCC})
