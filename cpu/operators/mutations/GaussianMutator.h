@@ -9,7 +9,7 @@
 
 #include "../Operator.h"
 #include "../../random/GaussianRandom.h"
-#include "../../random/UniformRandom.h"
+#include "../../random/UniformRandomCPU.h"
 
 
 class GaussianMutator : public Operator<std::vector<double>> {
@@ -20,7 +20,7 @@ private:
     double prob;
     std::random_device rd;
     std::mt19937 eng;
-    UniformRandom ur;
+    UniformRandomCPU ur;
     GaussianRandom gr;
 };
 

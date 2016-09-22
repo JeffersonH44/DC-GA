@@ -4,7 +4,7 @@
 
 #include <thrust/system/cuda/detail/bulk.h>
 #include "Tournament.h"
-#include "../random/UniformRandomInt.h"
+#include "../random/UniformRandomIntCPU.h"
 
 Tournament::Tournament(OptimizationFunction<std::vector<double> > &function, int n) :
     eng(rd())
@@ -14,7 +14,7 @@ Tournament::Tournament(OptimizationFunction<std::vector<double> > &function, int
 }
 
 size_t Tournament::chooseOne(std::vector<std::vector<double>> population) {
-    UniformRandomInt index(this->eng, 0, static_cast<int>(population.size()) - 1);
+    UniformRandomIntCPU index(this->eng, 0, static_cast<int>(population.size()) - 1);
 
     double fitness = std::numeric_limits<double>::max();
     size_t bestIndex = 0;

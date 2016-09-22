@@ -27,3 +27,5 @@ int main() {
 /*void test_cpu() {
 
 }*/
+
+functions/Rastrigin.cu random/BaseRandom.cu  random/UniformRandom.cu  random/UniformRandomInt.cu random/GaussianRandom.cu  operators/Operator.cu  operators/mutations/GaussianMutator.cu  operators/xover/LinearXOver.cu  ga/Hipercube.cu  ga/Space.cu  selection/Selection.cu  selection/Tournament.cu  ga/HAEA/AbstractHAEA.cu

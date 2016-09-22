@@ -3,7 +3,7 @@
 //
 
 #include "Tournament.h"
-#include "../../cpu/random/UniformRandomInt.h"
+#include "../../cpu/random/UniformRandomIntCPU.h"
 
 Tournament::Tournament(OptimizationFunction<thrust::device_vector<double> > &function, int n) :
     eng(rd())
@@ -13,7 +13,7 @@ Tournament::Tournament(OptimizationFunction<thrust::device_vector<double> > &fun
 }
 
 size_t Tournament::chooseOne(thrust::host_vector< thrust::device_vector<double> > population) {
-    UniformRandomInt index(this->eng, 0, static_cast<int>(population.size()) - 1);
+    UniformRandomIntCPU index(this->eng, 0, static_cast<int>(population.size()) - 1);
 
     double fitness = std::numeric_limits<double>::max();
     size_t bestIndex = 0;

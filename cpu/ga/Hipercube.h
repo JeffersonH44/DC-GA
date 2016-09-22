@@ -7,7 +7,7 @@
 
 #include <random>
 #include "Space.h"
-#include "../random/UniformRandom.h"
+#include "../random/UniformRandomCPU.h"
 
 class Hipercube : public Space<std::vector<double>> {
 public:
@@ -17,7 +17,7 @@ public:
 private:
     std::random_device rd;
     std::mt19937 eng;
-    UniformRandom ur;
+    UniformRandomCPU ur;
     std::vector<double> min, max;
 };
 

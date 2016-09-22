@@ -27,8 +27,8 @@ public:
     thrust::host_vector<thrust::device_vector<double>> apply(thrust::host_vector<thrust::device_vector<double>> &individuals);
 private:
     double prob;
-    UniformRandom ur;
-    GaussianRandom gr;
+    gpu::UniformRandom ur;
+    gpu::GaussianRandom gr;
 };
 
 

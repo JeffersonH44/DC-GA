@@ -8,7 +8,7 @@
 
 #include <random>
 #include "../Operator.h"
-#include "../../random/UniformRandom.h"
+#include "../../random/UniformRandomCPU.h"
 
 class LinearXOver : public Operator<std::vector<double>> {
 public:
@@ -17,7 +17,7 @@ public:
 private:
     std::random_device rd;
     std::mt19937 eng;
-    UniformRandom ur;
+    UniformRandomCPU ur;
 };
 
 

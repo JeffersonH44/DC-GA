@@ -2,8 +2,8 @@
 // Created by jefferson on 21/09/16.
 //
 
-#ifndef HOLA_LINEARXOVER_H
-#define HOLA_LINEARXOVER_H
+#ifndef GPU_HOLA_LINEARXOVER_H
+#define GPU_HOLA_LINEARXOVER_H
 
 #include <random>
 

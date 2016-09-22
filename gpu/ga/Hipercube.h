@@ -40,7 +40,7 @@ public:
     thrust::device_vector<double> repair(thrust::device_vector<double> val);
     thrust::device_vector<double> getRandomIndividual();
 private:
-    UniformRandom ur;
+    gpu::UniformRandom ur;
     double min, max;
     int dimension;
 };

@@ -5,6 +5,6 @@
 #include "GaussianRandom.h"
 
 GaussianRandom::GaussianRandom(std::mt19937 &eng, double mean, double std) :
-BaseRandom(eng, std::normal_distribution<>(mean, std))
+        BaseRandom(eng, std::normal_distribution<>(mean, std))
 {
 }

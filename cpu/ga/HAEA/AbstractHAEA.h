@@ -11,11 +11,11 @@
 #include <memory>
 #include <pthread.h>
 
-#include "../../random/UniformRandomInt.h"
+#include "../../random/UniformRandomIntCPU.h"
 #include "../Space.h"
 #include "../../functions/OptimizationFunction.h"
 #include "../../operators/Operator.h"
-#include "../../random/UniformRandom.h"
+#include "../../random/UniformRandomCPU.h"
 #include "../../selection/Selection.h"
 
 template <class T>
@@ -29,8 +29,8 @@ public:
     std::random_device rd;
     std::mt19937 eng;
 
-    UniformRandomInt randomOperator, randomIndividual;
-    UniformRandom ur;
+    UniformRandomIntCPU randomOperator, randomIndividual;
+    UniformRandomCPU ur;
 
     Space<T> *space;
     OptimizationFunction<T> *optimizationFunction;

@@ -8,10 +8,12 @@
 
 #include "BaseRandom.h"
 
-class UniformRandom : public BaseRandom<std::mt19937, std::uniform_real_distribution<>> {
+
+class UniformRandomCPU : public BaseRandom<std::mt19937, std::uniform_real_distribution<>> {
 public:
-    UniformRandom(std::mt19937 &eng, double a, double b);
+    UniformRandomCPU(std::mt19937 &eng, double a, double b);
 };
+
 
 
 #endif //HOLA_UNIFORMRANDOM_H
