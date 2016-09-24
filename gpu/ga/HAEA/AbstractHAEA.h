@@ -20,7 +20,7 @@
 template <class T>
 class AbstractHAEA {
 public:
-    AbstractHAEA(Selection<T> &selection, thrust::host_vector< std::shared_ptr<Operator<T> > > operators, size_t populationSize, size_t maxIters);
+    AbstractHAEA(Selection<T> &selection, std::vector< std::shared_ptr<Operator<T> > > operators, size_t populationSize, size_t maxIters);
 
     std::random_device rd;
     std::mt19937 eng;
@@ -32,18 +32,18 @@ public:
     OptimizationFunction<T> *optimizationFunction;
 
     size_t populationSize;
-    thrust::host_vector<T> population, new_population;
+    std::vector<T> population, new_population;
 
     size_t maxIters;
 
-    thrust::host_vector< thrust::host_vector<double> > operatorRates;
-    thrust::host_vector< std::shared_ptr<Operator<T> > > operators;
+    std::vector< std::vector<double> > operatorRates;
+    std::vector< std::shared_ptr<Operator<T> > > operators;
 
     Selection<T> *selection;
 
-    void ratesNormalize(thrust::host_vector<double> &operatorRates);
-    size_t operatorSelect(thrust::host_vector<double> rates);
-    thrust::host_vector<T> solve(Space<T> *space, OptimizationFunction<T> *goal);
+    void ratesNormalize(std::vector<double> &operatorRates);
+    size_t operatorSelect(std::vector<double> rates);
+    std::vector<T> solve(Space<T> *space, OptimizationFunction<T> *goal);
 private:
     void initPopulation();
 };
@@ -56,7 +56,7 @@ struct thread_args {
 };
 
 template <class T>
-size_t AbstractHAEA<T>::operatorSelect(thrust::host_vector<double> rates) {
+size_t AbstractHAEA<T>::operatorSelect(std::vector<double> rates) {
     size_t size = rates.size();
 
     std::vector<double> values(size + 1, 0.0);
@@ -78,7 +78,7 @@ size_t AbstractHAEA<T>::operatorSelect(thrust::host_vector<double> rates) {
 }
 
 template <class T>
-void AbstractHAEA<T>::ratesNormalize(thrust::host_vector<double> &operatorRates) {
+void AbstractHAEA<T>::ratesNormalize(std::vector<double> &operatorRates) {
     double sum = 0.0;
     size_t size = operatorRates.size();
     for(size_t i = 0; i < size; ++i) {
@@ -94,7 +94,7 @@ void AbstractHAEA<T>::initPopulation() {
     for(size_t i = 0; i < this->populationSize; ++i) {
         this->population.push_back(this->space->getRandomIndividual());
 
-        thrust::host_vector<double> operRates(this->operators.size(), 0.0);
+        std::vector<double> operRates(this->operators.size(), 0.0);
         for(size_t j = 0; j < this->operators.size(); ++j) {
             operRates[j] = this->ur.generate();
         }
@@ -107,7 +107,7 @@ void AbstractHAEA<T>::initPopulation() {
 }
 
 template <class T>
-AbstractHAEA<T>::AbstractHAEA(Selection<T> &selection, thrust::host_vector< std::shared_ptr<Operator<T> > > operators, size_t populationSize, size_t maxIters) :
+AbstractHAEA<T>::AbstractHAEA(Selection<T> &selection, std::vector< std::shared_ptr<Operator<T> > > operators, size_t populationSize, size_t maxIters) :
 eng(rd()),
 randomOperator(eng, 0, static_cast<int>(operators.size()) - 1),
 ur(eng, 0.0, 1.0),
@@ -120,29 +120,25 @@ new_population(populationSize)
 }
 
 template <class T>
-thrust::host_vector<T> AbstractHAEA<T>::solve(Space<T> *space, OptimizationFunction<T> *goal) {
+std::vector<T> AbstractHAEA<T>::solve(Space<T> *space, OptimizationFunction<T> *goal) {
     this->space = space;
     this->optimizationFunction = goal;
 
     this->initPopulation();
-    std::cout << "population ready" << std::endl;
+
     for(size_t i = 0; i < this->maxIters; ++i) {
         //printf("%li %li\n", from, to);
         for(size_t j = 0; j < this->populationSize; ++j) {
             T parent = this->population[j];
-            std::cout << "hi1" << std::endl;
             double delta = this->ur.generate();
-            std::cout << "hi2" << std::endl;
 
-            thrust::host_vector<double> rates = this->operatorRates[j];
-            std::cout << "hi3" << std::endl;
+            std::vector<double> rates = this->operatorRates[j];
             size_t operatorIndex = this->operatorSelect(rates);
-            std::cout << "hi4" << std::endl;
             std::shared_ptr< Operator<T> > op = this->operators[operatorIndex];
             int arguments = op->getArguments();
 
             double parentFitness = this->optimizationFunction->apply(parent);
-            thrust::host_vector<T> selectedIndividuals;
+            std::vector<T> selectedIndividuals;
             selectedIndividuals.push_back(parent);
             for(int k = 1; k < arguments; ++k) {
                 // TODO: selection of the other individuals
@@ -153,7 +149,7 @@ thrust::host_vector<T> AbstractHAEA<T>::solve(Space<T> *space, OptimizationFunct
                 selectedIndividuals.push_back(this->population[index]);
             }
 
-            thrust::host_vector<T> offspring = op->apply(selectedIndividuals);
+            std::vector<T> offspring = op->apply(selectedIndividuals);
 
             // repair offspring
             for(size_t k = 0; k < offspring.size(); ++k) {
@@ -185,7 +181,6 @@ thrust::host_vector<T> AbstractHAEA<T>::solve(Space<T> *space, OptimizationFunct
 
             this->new_population[j] = child;
         }
-
 
         this->population = this->new_population;
     }

@@ -13,7 +13,7 @@
 class Tournament : public Selection<thrust::device_vector<double> >{
 public:
     Tournament(OptimizationFunction<thrust::device_vector<double> > &function, int n);
-    size_t chooseOne(thrust::host_vector< thrust::device_vector<double> > population);
+    size_t chooseOne(std::vector< thrust::device_vector<double> > population);
 private:
     std::random_device rd;
     std::mt19937 eng;

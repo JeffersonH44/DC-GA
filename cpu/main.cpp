@@ -18,17 +18,15 @@ using get_time = chrono::steady_clock;
 void test();
 
 int main() {
-    Rastrigin r;
-    vector<double> vec(1000, 4);
-    cout << r.apply(vec) << endl;
+    test();
     return 0;
 }
 
 void test() {
-    size_t popSize[] = {50, 100, 200, 500, 1000};
-    for(int i = 0; i < 5; ++i) {
+    size_t popSize[] = {50};
+    for(int i = 0; i < 1; ++i) {
         cout << "population size: " << popSize[i] << endl;
-        for(size_t j = 1; j <= 8; j += 7) {
+        for(size_t j = 1; j <= 5; j += 7) {
 
             ofstream file;
             file.open(to_string(popSize[i]) + "_" + to_string(j) + ".txt");
@@ -59,7 +57,7 @@ void test() {
                 auto end = get_time::now();
                 auto diff = end - start;
                 file  << chrono::duration_cast<ns>(diff).count() << " ";
-                vector<vector<double> > result = search.solve(&space, &optimizationFunction, THREADS);
+                /*vector<vector<double> > result = search.solve(&space, &optimizationFunction, THREADS);
                 double mean = 0.0;
 
                 for(size_t i = 0; i < result.size(); ++i) {
@@ -70,7 +68,7 @@ void test() {
                 }
 
                 mean /= result.size();
-                rmean += mean;
+                rmean += mean;*/
             }
             file.close();
         }

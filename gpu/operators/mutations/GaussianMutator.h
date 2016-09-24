@@ -24,7 +24,7 @@ struct allow_mut {
 class GaussianMutator : public Operator<thrust::device_vector<double>> {
 public:
     GaussianMutator(double mean, double std, double prob);
-    thrust::host_vector<thrust::device_vector<double>> apply(thrust::host_vector<thrust::device_vector<double>> &individuals);
+    std::vector<thrust::device_vector<double>> apply(std::vector<thrust::device_vector<double>> &individuals);
 private:
     double prob;
     gpu::UniformRandom ur;

@@ -13,8 +13,7 @@
 template <class T>
 class Selection {
 public:
-    virtual size_t chooseOne(thrust::host_vector<T> population) = 0;
-
+    virtual size_t chooseOne(std::vector<T> population) = 0;
 protected:
     OptimizationFunction<T> *function;
 };

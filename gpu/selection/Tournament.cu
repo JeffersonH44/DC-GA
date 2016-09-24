@@ -12,7 +12,7 @@ Tournament::Tournament(OptimizationFunction<thrust::device_vector<double> > &fun
     this->n = n;
 }
 
-size_t Tournament::chooseOne(thrust::host_vector< thrust::device_vector<double> > population) {
+size_t Tournament::chooseOne(std::vector< thrust::device_vector<double> > population) {
     UniformRandomIntCPU index(this->eng, 0, static_cast<int>(population.size()) - 1);
 
     double fitness = std::numeric_limits<double>::max();

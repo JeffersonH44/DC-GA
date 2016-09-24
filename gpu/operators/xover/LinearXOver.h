@@ -23,7 +23,7 @@ struct linear_xover {
 class LinearXOver : public Operator<thrust::device_vector<double> > {
 public:
     LinearXOver();
-    thrust::host_vector<thrust::device_vector<double>> apply(thrust::host_vector<thrust::device_vector<double>> &individuals);
+    std::vector<thrust::device_vector<double>> apply(std::vector<thrust::device_vector<double>> &individuals);
 };
 
 
