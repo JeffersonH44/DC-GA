@@ -9,6 +9,7 @@
 #include "operators/mutations/GaussianMutator.h"
 #include "operators/xover/LinearXOver.h"
 #include "ga/HAEA/AbstractHAEA.h"
+#include "ga/HAEA/PosixHAEA.h"
 
 
 using namespace std;
@@ -26,7 +27,7 @@ void test() {
     size_t popSize[] = {50};
     for(int i = 0; i < 1; ++i) {
         cout << "population size: " << popSize[i] << endl;
-        for(size_t j = 1; j <= 5; j += 7) {
+        for(size_t j = 8; j <= 8; j += 7) {
 
             ofstream file;
             file.open(to_string(popSize[i]) + "_" + to_string(j) + ".txt");
@@ -46,14 +47,15 @@ void test() {
             opers.push_back(make_shared<GaussianMutator>(0.0, 0.3, 0.1));
             opers.push_back(make_shared<LinearXOver>());
 
-            AbstractHAEA<vector<double>> search(selection, opers, POP, ITERS);
+            PosixHAEA<vector<double>> search(selection, opers, POP, ITERS);
+            search.setThreads(THREADS);
 
             double rmean = 0.0;
 
             for(int k = 0; k < sampling; ++k) {
                 cout << "iter: " << k << endl;
                 auto start = get_time::now();
-                search.solve(&space, &optimizationFunction, THREADS);
+                search.solve(&space, &optimizationFunction);
                 auto end = get_time::now();
                 auto diff = end - start;
                 file  << chrono::duration_cast<ns>(diff).count() << " ";

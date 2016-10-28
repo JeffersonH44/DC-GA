@@ -11,6 +11,6 @@ set(SOURCE_FILES_CXX main.cpp ga/Space.cpp ga/Space.h ga/Hipercube.cpp ga/Hiperc
         random/UniformRandomCPU.cpp random/UniformRandomCPU.h operators/xover/LinearXOver.cpp
         operators/xover/LinearXOver.h distance/Distance.cpp distance/Distance.h ga/HAEA/AbstractHAEA.cpp
         ga/HAEA/AbstractHAEA.h random/UniformRandomIntCPU.cpp random/UniformRandomIntCPU.h selection/Selection.cpp
-        selection/Selection.h selection/Tournament.cpp selection/Tournament.h)
+        selection/Selection.h selection/Tournament.cpp selection/Tournament.h ga/HAEA/PosixHAEA.cpp ga/HAEA/PosixHAEA.h)
 
 add_executable(cpu ${SOURCE_FILES_CXX})

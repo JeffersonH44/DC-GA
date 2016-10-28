@@ -25,7 +25,16 @@ void test();
 
 // Main routine that executes on the host
 int main() {
-    test();
+    Hipercube space(-5.12, 5.12, 100000);
+    auto a = space.getRandomIndividual(); // zoloh auto lok
+    Rastrigin opt;
+    auto start = get_time::now();
+    for(int i = 0 ; i < 10000; ++i) {
+        opt.apply(a);
+    }
+    auto end = get_time::now();
+    auto diff = end - start;
+    cout << std::chrono::duration_cast<ns>(diff).count() << " ";
     return 0;
 }
 
