@@ -10,6 +10,7 @@
 #include <iostream>
 #include <thrust/host_vector.h>
 #include <thrust/device_vector.h>
+#include <omp.h>
 
 #include "../../selection/Selection.h"
 #include "../../operators/Operator.h"
@@ -125,9 +126,7 @@ std::vector<T> AbstractHAEA<T>::solve(Space<T> *space, OptimizationFunction<T> *
     this->optimizationFunction = goal;
 
     this->initPopulation();
-
     for(size_t i = 0; i < this->maxIters; ++i) {
-        //printf("%li %li\n", from, to);
         for(size_t j = 0; j < this->populationSize; ++j) {
             T parent = this->population[j];
             double delta = this->ur.generate();

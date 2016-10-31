@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.6)
 project(cpu)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -lpthread -pedantic -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wsign-conversion -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default -Wundef -Werror -Wno-unused")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fopenmp -lpthread -pedantic -Wall -Wextra -Wcast-align -Wcast-qual -Wctor-dtor-privacy -Wdisabled-optimization -Wformat=2 -Winit-self -Wlogical-op -Wmissing-declarations -Wmissing-include-dirs -Wnoexcept -Wold-style-cast -Woverloaded-virtual -Wredundant-decls -Wsign-conversion -Wsign-promo -Wstrict-null-sentinel -Wstrict-overflow=5 -Wswitch-default -Wundef -Werror -Wno-unused")
 
 
 set(SOURCE_FILES_CXX main.cpp ga/Space.cpp ga/Space.h ga/Hipercube.cpp ga/Hipercube.h functions/OptimizationFunction.cpp
@@ -11,6 +11,6 @@ set(SOURCE_FILES_CXX main.cpp ga/Space.cpp ga/Space.h ga/Hipercube.cpp ga/Hiperc
         random/UniformRandomCPU.cpp random/UniformRandomCPU.h operators/xover/LinearXOver.cpp
         operators/xover/LinearXOver.h distance/Distance.cpp distance/Distance.h ga/HAEA/AbstractHAEA.cpp
         ga/HAEA/AbstractHAEA.h random/UniformRandomIntCPU.cpp random/UniformRandomIntCPU.h selection/Selection.cpp
-        selection/Selection.h selection/Tournament.cpp selection/Tournament.h ga/HAEA/PosixHAEA.cpp ga/HAEA/PosixHAEA.h)
+        selection/Selection.h selection/Tournament.cpp selection/Tournament.h ga/HAEA/PosixHAEA.cpp ga/HAEA/PosixHAEA.h ga/HAEA/OpenMPHAEA.cpp ga/HAEA/OpenMPHAEA.h)
 
 add_executable(cpu ${SOURCE_FILES_CXX})

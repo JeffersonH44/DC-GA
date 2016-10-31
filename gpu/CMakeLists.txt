@@ -4,8 +4,10 @@ project(gpu)
 FIND_PACKAGE(CUDA)
 INCLUDE(FindCUDA)
 
-list(APPEND CMAKE_CXX_FLAGS "-std=c++11")
-list(APPEND CUDA_NVCC_FLAGS "-std=c++11 -gencode arch=compute_35,code=compute_35")
+set(CMAKE_NVCC_COMPILER /opt/pgi/linux86-64/16.7/bin/pgc++)
+
+list(APPEND CMAKE_CXX_FLAGS "-std=c++11 -fopenmp")
+list(APPEND CUDA_NVCC_FLAGS "-std=c++11 -gencode arch=compute_50,code=compute_50 -Xcompiler -fopenmp -lgomp")
 set(CUDA_PROPAGATE_HOST_FLAGS OFF)
 
 set(SOURCE_FILES_NVCC main.cu functions/Rastrigin.cu functions/Rastrigin.h random/BaseRandom.cu
