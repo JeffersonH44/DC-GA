@@ -9,7 +9,7 @@
 #include "BaseRandomCPU.h"
 #include <random>
 
-class UniformRandomIntCPU : public BaseRandom<std::mt19937, std::uniform_int_distribution<>> {
+class UniformRandomIntCPU : public BaseRandomCPU<std::mt19937, std::uniform_int_distribution<>> {
 public:
     UniformRandomIntCPU(std::mt19937 &eng, int a, int b);
 };

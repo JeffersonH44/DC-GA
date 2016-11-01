@@ -4,8 +4,6 @@ CC=pgcc
 CFLAGS=-fast -acc -ta=nvidia:rdc -Minfo=accel
 CUDAC=nvcc
 CUDAFLAGS=-std=c++11 -gencode arch=compute_50,code=compute_50 -Xcompiler -fopenmp -lgomp
-FC=pgfortran
-FFLAGS=-fast -acc -ta=nvidia -Minfo=accel
 LDFLAGS=-Mcuda #-L$(CUDA_HOME)/lib64 -lcudart
 
 all: main
@@ -26,7 +24,7 @@ all: main
 clean:
 	rm -rf *.o *.ptx *.cub *.lst *.mod $(EXES)
 
-main: main.o UniformRandom.o UniformRandomInt.o BaseRandom.o UniformRandomIntCPU.o UniformRandomCPU.o AbstractHAEA.o BaseRandomCPU.o GaussianRandom.o LinearXOver.o GaussianRandom.o Operator.o OptimizationFunction.o Rastrigin.o Space.o Hipercube.o Tournament.o GaussianMutator.o
+main: main.o UniformRandom.o UniformRandomInt.o BaseRandom.o UniformRandomIntCPU.o UniformRandomCPU.o AbstractHAEA.o BaseRandomCPU.o GaussianRandom.o LinearXOver.o GaussianRandom.o Operator.o OptimizationFunction.o Rastrigin.o Space.o Hipercube.o Tournament.o GaussianMutator.o test.o
 	$(CXX) -o $@ $(CXXFLAGS) $^ $(LDFLAGS) -lstdc++
 
 clean:
