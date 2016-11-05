@@ -1,29 +1,24 @@
 //
-// Created by jefferson on 21/09/16.
+// Created by jefferson on 5/09/16.
 //
 
-#ifndef GPU_HOLA_LINEARXOVER_H
-#define GPU_HOLA_LINEARXOVER_H
+#ifndef HOLA_LINEARXOVER_H
+#define HOLA_LINEARXOVER_H
+
 
 #include <random>
-
 #include "Operator.h"
+#include "UniformRandomCPU.h"
 
-struct linear_xover {
-    const double c;
-
-    linear_xover(double c) : c(c) {}
-
-    __host__ __device__
-    double operator()(const double& x, const double& y) {
-        return x * c + y * (1.0 - c);
-    }
-};
-
-class LinearXOver : public Operator<thrust::device_vector<double> > {
+class LinearXOver : public Operator<double*> {
 public:
-    LinearXOver();
-    std::vector<thrust::device_vector<double>> apply(std::vector<thrust::device_vector<double>> &individuals);
+    LinearXOver(size_t dimension);
+    double** apply(double **individuals);
+private:
+    std::random_device rd;
+    std::mt19937 eng;
+    UniformRandomCPU ur;
+    size_t dimension;
 };
 
 

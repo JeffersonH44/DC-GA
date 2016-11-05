@@ -24,8 +24,11 @@ all: main
 clean:
 	rm -rf *.o *.ptx *.cub *.lst *.mod $(EXES)
 
-main: main.o UniformRandom.o UniformRandomInt.o BaseRandom.o UniformRandomIntCPU.o UniformRandomCPU.o AbstractHAEA.o BaseRandomCPU.o GaussianRandom.o LinearXOver.o GaussianRandom.o Operator.o OptimizationFunction.o Rastrigin.o Space.o Hipercube.o Tournament.o GaussianMutator.o test.o
+main: main.o BaseRandom.o UniformRandomIntCPU.o UniformRandomCPU.o AbstractHAEA.o GaussianRandom.o LinearXOver.o GaussianRandom.o Operator.o OptimizationFunction.o Rastrigin.o Space.o Hipercube.o Tournament.o GaussianMutator.o
 	$(CXX) -o $@ $(CXXFLAGS) $^ $(LDFLAGS) -lstdc++
 
 clean:
 	rm -Rf main pgprof* *.o core
+
+clean-main:
+	rm main AbstractHAEA.o

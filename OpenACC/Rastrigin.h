@@ -1,26 +1,25 @@
 //
-// Created by jefferson on 20/09/16.
+// Created by jefferson on 3/09/16.
 //
 
 #ifndef HOLA_RASTRIGIN_H
 #define HOLA_RASTRIGIN_H
 
-
 #include <vector>
 #include <cmath>
 #include "OptimizationFunction.h"
-#include <thrust/device_vector.h>
 
-class Rastrigin : public OptimizationFunction<thrust::device_vector<double> >{
+class Rastrigin : public OptimizationFunction<double*>{
 public:
-    Rastrigin(bool minimize);
-    Rastrigin(double objective);
-    Rastrigin();
-    double apply(thrust::device_vector<double> ind);
+    Rastrigin(size_t dimension, bool minimize);
+    Rastrigin(size_t dimension, double objective);
+    Rastrigin(size_t dimension);
+    double apply(double* ind);
     double apply(double val);
 
 private:
     double objective;
+    size_t dimension;
 };
 
 

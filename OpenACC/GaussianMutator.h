@@ -1,33 +1,27 @@
 //
-// Created by jefferson on 21/09/16.
+// Created by jefferson on 3/09/16.
 //
 
 #ifndef HOLA_GAUSSIANMUTATOR_H
 #define HOLA_GAUSSIANMUTATOR_H
 
+#include <vector>
 
 #include "Operator.h"
 #include "GaussianRandom.h"
-#include "UniformRandom.h"
+#include "UniformRandomCPU.h"
 
-struct allow_mut {
-    const double prob;
 
-    allow_mut(double prob) : prob(prob) {}
-
-    __host__ __device__
-    double operator()(const double& x, const double& y) {
-        return x < prob ? y : 0.0;
-    }
-};
-
-class GaussianMutator : public Operator<thrust::device_vector<double>> {
+class GaussianMutator : public Operator<double*> {
 public:
-    GaussianMutator(double mean, double std, double prob);
-    std::vector<thrust::device_vector<double>> apply(std::vector<thrust::device_vector<double>> &individuals);
+    GaussianMutator(double mean, double std, double prob, size_t dimension);
+    double** apply(double **individuals);
 private:
     double prob;
-    UniformRandom ur;
+    size_t dimension;
+    std::random_device rd;
+    std::mt19937 eng;
+    UniformRandomCPU ur;
     GaussianRandom gr;
 };
 

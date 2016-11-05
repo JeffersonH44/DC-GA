@@ -6,10 +6,10 @@
 #define HOLA_UNIFORMRANDOM_H
 
 
-#include "BaseRandomCPU.h"
+#include "BaseRandom.h"
 
 
-class UniformRandomCPU : public BaseRandomCPU<std::mt19937, std::uniform_real_distribution<>> {
+class UniformRandomCPU : public BaseRandom<std::mt19937, std::uniform_real_distribution<>> {
 public:
     UniformRandomCPU(std::mt19937 &eng, double a, double b);
 };

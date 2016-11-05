@@ -1,48 +1,28 @@
 //
-// Created by jefferson on 21/09/16.
+// Created by jefferson on 3/09/16.
 //
 
 #ifndef HOLA_HIPERCUBE_H
 #define HOLA_HIPERCUBE_H
 
-
 #include <random>
 #include "Space.h"
-#include "UniformRandom.h"
+#include "UniformRandomCPU.h"
 
-struct rep
-{
-    double max, min;
-
-    __host__ __device__
-    rep(double min, double max) :
-            min(min),
-            max(max)
-    {
-    };
-
-    __host__ __device__
-    double operator()(const double n)
-    {
-        if(n > max) {
-            return max;
-        } else if(n < min) {
-            return min;
-        }
-
-        return n;
-    }
-};
-
-class Hipercube : public Space<thrust::device_vector<double>> {
+class Hipercube : public Space<double*> {
 public:
-    Hipercube(double min, double max, int dimension);
-    thrust::device_vector<double> repair(thrust::device_vector<double> val);
-    thrust::device_vector<double> getRandomIndividual();
+    Hipercube(double lower, double upper, size_t dimension);
+    double* repair(double* val);
+    double* getRandomIndividual();
+    size_t getDimension();
+    ~Hipercube();
 private:
-    UniformRandom ur;
-    double min, max;
-    int dimension;
+    std::random_device rd;
+    std::mt19937 eng;
+    UniformRandomCPU ur;
+    double *min, *max;
+    size_t dimension;
+    std::vector<double*> pointers;
 };
 
 

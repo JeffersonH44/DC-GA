@@ -5,6 +5,6 @@
 #include "UniformRandomCPU.h"
 
 UniformRandomCPU::UniformRandomCPU(std::mt19937 &eng, double a, double b) :
-        BaseRandomCPU(eng, std::uniform_real_distribution<>(a, b))
+        BaseRandom(eng, std::uniform_real_distribution<>(a, b))
 {
 }
