@@ -17,10 +17,10 @@ ur(eng, lower, upper)
     this->dimension = dimension;
 }
 
-double* Hipercube::repair(double* val) {
-    double *ret = new double[this->dimension];
-    std::copy(val, val + this->dimension, ret);
+double* Hipercube::repair(double *val) {
+    double *ret = val;
 
+    #pragma acc parallel loop deviceptr(val)
     for(size_t i = 0; i < this->dimension; ++i) {
         if(ret[i] < this->min[i]) {
             ret[i] = this->min[i];

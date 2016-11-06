@@ -6,12 +6,14 @@
 #define HOLA_SPACE_H
 
 #include <vector>
+#include <cstddef>
 
 template <class T>
 class Space {
 public:
     virtual T repair(T val) = 0;
     virtual T getRandomIndividual() = 0;
+    virtual size_t getDimension() = 0;
 };
 
 

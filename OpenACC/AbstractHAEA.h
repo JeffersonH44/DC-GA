@@ -10,6 +10,7 @@
 #include <random>
 #include <memory>
 #include <pthread.h>
+#include "openacc.h"
 
 #include "UniformRandomIntCPU.h"
 #include "Space.h"
@@ -21,7 +22,7 @@
 template <class T>
 class AbstractHAEA {
 public:
-    AbstractHAEA(Selection<T> &selection, std::vector< std::shared_ptr<Operator<T> > > operators, size_t populationSize, size_t maxIters);
+    AbstractHAEA(Tournament &selection, size_t operatorSize, Operator<T> **operators, size_t populationSize, size_t maxIters);
 
     pthread_barrier_t pthreadBarrier;
 
@@ -35,27 +36,42 @@ public:
     OptimizationFunction<T> *optimizationFunction;
 
     size_t populationSize;
-    std::vector<T> population, new_population;
-
+    size_t operatorSize;
     size_t maxIters;
 
-    std::vector< std::vector<double> > operatorRates;
-    std::vector< std::shared_ptr<Operator<T> > > operators;
+    T *population, *newPopulation;
 
-    Selection<T> *selection;
+    double **operatorRates;
+    Operator<T> **operators;
 
-    void ratesNormalize(std::vector<double> &operatorRates);
-    size_t operatorSelect(std::vector<double> rates);
-    virtual std::vector<T> solve(Space<T> *space, OptimizationFunction<T> *goal) = 0;
+    Tournament *selection;
+
+    #pragma acc routine seq
+    void ratesNormalize(double *operatorRates);
+    #pragma acc routine seq
+    size_t operatorSelect(double *rates);
+    virtual T* solve(Space<T> *space, OptimizationFunction<T> *goal) = 0;
 protected:
     void initPopulation();
 };
 
 template <class T>
-size_t AbstractHAEA<T>::operatorSelect(std::vector<double> rates) {
-    size_t size = rates.size();
+size_t AbstractHAEA<T>::operatorSelect(double *rates) {
+    size_t size = this->operatorSize;
 
-    std::vector<double> values(size + 1, 0.0);
+    double lower = 0.0;
+    double upper = rates[0];
+    double num = this->ur.generate();
+    for(size_t i = 1; i < size + 1; ++i) {
+        if(lower <= num && num < upper)
+            return i;
+        lower = upper;
+        upper += i < size ? rates[i] : 0.0;
+    }
+
+    /*double *values = (double*) acc_malloc(sizeof(double) * (size + 1));
+
+    std::fill(values, values + size + 1, 0.0);
     double sum = 0.0;
     values[size] = 1.0;
     for(size_t i = 1; i < size; ++i) {
@@ -63,20 +79,20 @@ size_t AbstractHAEA<T>::operatorSelect(std::vector<double> rates) {
         values[i] = sum;
     }
 
-    double num = this->ur.generate();
     for(size_t i = 0; i < size; ++i) {
         if(values[i] <= num && num < values[i + 1]) {
+            acc_free(values);
             return static_cast<size_t>(i);
         }
-    }
+    }*/
 
     return 2387454937;
 }
 
 template <class T>
-void AbstractHAEA<T>::ratesNormalize(std::vector<double> &operatorRates) {
+void AbstractHAEA<T>::ratesNormalize(double *operatorRates) {
     double sum = 0.0;
-    size_t size = operatorRates.size();
+    size_t size = this->operatorSize;
     for(size_t i = 0; i < size; ++i) {
         sum += operatorRates[i];
     }
@@ -87,32 +103,38 @@ void AbstractHAEA<T>::ratesNormalize(std::vector<double> &operatorRates) {
 
 template <class T>
 void AbstractHAEA<T>::initPopulation() {
-    for(size_t i = 0; i < this->populationSize; ++i) {
-        this->population.push_back(this->space->getRandomIndividual());
+    this->population = new T[this->populationSize];
+    this->newPopulation = new T[this->populationSize];
+    this->operatorRates = new double*[this->populationSize];
+    for(int i = 0; i < this->populationSize; ++i) {
+        this->operatorRates[i] = new double[this->operatorSize];
+    }
 
-        std::vector<double> operRates(this->operators.size(), 0.0);
-        for(size_t j = 0; j < this->operators.size(); ++j) {
-            operRates[j] = this->ur.generate();
+    for(size_t i = 0; i < this->populationSize; ++i) {
+        this->population[i] = this->space->getRandomIndividual();
+        this->newPopulation[i] = this->space->getRandomIndividual();
+        //std::vector<double> operRates(this->operators.size(), 0.0);
+        for(size_t j = 0; j < this->operatorSize; ++j) {
+            this->operatorRates[i][j] = this->ur.generate();
         }
 
-        this->ratesNormalize(operRates);
-
-        this->operatorRates.push_back(operRates);
+        this->ratesNormalize(this->operatorRates[i]);
     }
 
 }
 
 template <class T>
-AbstractHAEA<T>::AbstractHAEA(Selection<T> &selection, std::vector< std::shared_ptr<Operator<T> > > operators, size_t populationSize, size_t maxIters) :
+AbstractHAEA<T>::AbstractHAEA(Tournament &selection, size_t operatorSize, Operator<T> **operators, size_t populationSize, size_t maxIters) :
         eng(rd()),
-        randomOperator(eng, 0, static_cast<int>(operators.size()) - 1),
+        randomOperator(eng, 0, static_cast<int>(operatorSize - 1)),
         randomIndividual(eng, 0, static_cast<int>(populationSize - 1)),
-        ur(eng, 0.0, 1.0),
-        new_population(populationSize)
+        ur(eng, 0.0, 1.0)
 {
-    this->operators = operators;
     this->maxIters = maxIters;
     this->populationSize = populationSize;
+    this->operatorSize = operatorSize;
+
+    this->operators = operators;
     this->selection = &selection;
 }
 

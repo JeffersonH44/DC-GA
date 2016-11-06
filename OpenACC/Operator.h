@@ -11,6 +11,7 @@ template <class T>
 class Operator {
 public:
     virtual T* apply(T *individuals) = 0;
+    #pragma acc routine seq
     int getArguments();
 protected:
     int arguments;

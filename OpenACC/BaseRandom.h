@@ -13,6 +13,7 @@ template <class RandomGenerator, class Distribution>
 class BaseRandom {
 public:
     BaseRandom(RandomGenerator &randomGenerator, Distribution distribution);
+    #pragma acc routine seq
     double generate();
 protected:
     Distribution distribution;

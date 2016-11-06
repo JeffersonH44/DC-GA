@@ -18,8 +18,14 @@ using ns = chrono::microseconds;
 using get_time = chrono::steady_clock;
 
 void test();
+void test1();
 
 int main() {
+    test();
+    return 0;
+}
+
+void test1() {
     Hipercube h(-5.12, 5.12, 10000);
     vector<double> a = h.getRandomIndividual();
     vector<double> b = h.getRandomIndividual();
@@ -36,8 +42,6 @@ int main() {
     auto end = get_time::now();
     auto diff = end - start;
     cout << std::chrono::duration_cast<ns>(diff).count() << " ";
-    //test();
-    return 0;
 }
 
 void test() {

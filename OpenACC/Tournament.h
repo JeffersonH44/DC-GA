@@ -13,6 +13,7 @@
 class Tournament : public Selection<double*>{
 public:
     Tournament(OptimizationFunction<double*> &function, int n, size_t dimension, size_t populationSize);
+    Tournament(Tournament tournament, size_t populationSize);
     size_t chooseOne(double **population);
 
 private:

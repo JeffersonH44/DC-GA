@@ -9,9 +9,9 @@
 #include <omp.h>
 
 template <class T>
-class OpenMPHAEA : public AbstractHAEA<T> {
+class OpenACCHAEA : public AbstractHAEA<T> {
 public:
-    OpenMPHAEA(Selection<T> &selection, std::vector< std::shared_ptr<Operator<T> > > operators, size_t populationSize, size_t maxIters);
+    OpenACCHAEA(Selection<T> &selection, std::vector< std::shared_ptr<Operator<T> > > operators, size_t populationSize, size_t maxIters);
     std::vector<T> solve(Space<T> *space, OptimizationFunction<T> *goal);
     void setThreads(size_t threads);
 private:
@@ -19,13 +19,13 @@ private:
 };
 
 template <class T>
-OpenMPHAEA<T>::OpenMPHAEA(Selection<T> &selection, std::vector<std::shared_ptr<Operator<T> > > operators,
+OpenACCHAEA<T>::OpenACCHAEA(Selection<T> &selection, std::vector<std::shared_ptr<Operator<T> > > operators,
                        size_t populationSize, size_t maxIters) : AbstractHAEA<T>(selection, operators, populationSize,
                                                                               maxIters) {
 }
 
 template <class T>
-std::vector<T> OpenMPHAEA<T>::solve(Space<T> *space, OptimizationFunction<T> *goal) {
+std::vector<T> OpenACCHAEA<T>::solve(Space<T> *space, OptimizationFunction<T> *goal) {
     this->space = space;
     this->optimizationFunction = goal;
 
@@ -94,7 +94,7 @@ std::vector<T> OpenMPHAEA<T>::solve(Space<T> *space, OptimizationFunction<T> *go
 }
 
 template <class T>
-void OpenMPHAEA<T>::setThreads(size_t threads) {
+void OpenACCHAEA<T>::setThreads(size_t threads) {
     this->threads = threads;
 }
 

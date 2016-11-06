@@ -12,6 +12,7 @@
 template <class T>
 class Selection {
 public:
+    #pragma acc routine seq
     virtual size_t chooseOne(T *population) = 0;
 
 protected:

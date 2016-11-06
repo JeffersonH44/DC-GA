@@ -14,19 +14,22 @@ Tournament::Tournament(OptimizationFunction<double*> &function, int n, size_t di
     this->dimension = dimension;
 }
 
+Tournament::Tournament(Tournament tournament, size_t populationSize) :
+    Tournament(tournament.function, tournament.n, tournament.dimension, populationSize)
+{
+}
+
 size_t Tournament::chooseOne(double **population) {
     double fitness = std::numeric_limits<double>::max();
     size_t bestIndex = 0;
     for(int i = 0; i < n; ++i) {
         int currIndex = randomIndex.generate();
-        std::cout << currIndex << " ";
         double currentFitness = function->apply(population[currIndex]);
         if(currentFitness < fitness) {
             fitness = currentFitness;
             bestIndex = currIndex;
         }
     }
-    std::cout << std::endl;
 
     return bestIndex;
 }

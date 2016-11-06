@@ -9,6 +9,7 @@
 #include "GaussianMutator.h"
 #include "LinearXOver.h"
 #include "AbstractHAEA.h"
+#include "OpenACCHAEA.h"
 
 
 using namespace std;
@@ -17,8 +18,14 @@ using get_time = chrono::steady_clock;
 size_t DIM = 1000;
 
 void test();
+void test1();
 
 int main() {
+    test();
+    return 0;
+}
+
+void test1() {
     Hipercube h(-5.12, 5.12, DIM);
     Rastrigin r(DIM);
     double *inds[10];
@@ -36,11 +43,9 @@ int main() {
     auto end = get_time::now();
     auto diff = end - start;
     cout << std::chrono::duration_cast<ns>(diff).count() << endl;
-    //test();
-    return 0;
 }
 
-/*void test() {
+void test() {
     size_t popSize[] = {50};
     for(int i = 0; i < 1; ++i) {
         cout << "population size: " << popSize[i] << endl;
@@ -57,37 +62,39 @@ int main() {
             int sampling = 3;
 
             Hipercube space(-5.12, 5.12, DIM);
-            Rastrigin optimizationFunction;
-            Tournament selection(optimizationFunction, 4);
+            Rastrigin optimizationFunction(DIM);
+            Tournament selection(optimizationFunction, 4, DIM, POP);
 
-            cout << optimizationFunction.apply(space.getRandomIndividual()) << endl;
+            //cout << optimizationFunction.apply(space.getRandomIndividual()) << endl;
 
-            vector< shared_ptr<Operator<vector<double> > > > opers;
-            opers.push_back(make_shared<GaussianMutator>(0.0, 0.3, 0.1));
-            opers.push_back(make_shared<LinearXOver>());
+            Operator<double*> **opers = new Operator<double*>*[2];
+            opers[0] = new GaussianMutator(0.0, 0.3, 0.1, DIM);
+            opers[1] = new LinearXOver(DIM);
 
-            OpenMPHAEA<vector<double>> search(selection, opers, POP, ITERS);
+            OpenACCHAEA<double*> search(selection, 2, opers, POP, ITERS);
             search.setThreads(THREADS);
 
-            double rmean = 0.0;
+            //double rmean = 0.0;
 
             for(int k = 0; k < sampling; ++k) {
                 cout << "iter: " << k << endl;
                 auto start = get_time::now();
-                vector<vector<double>> pop = search.solve(&space, &optimizationFunction);
+                double **pop = search.solve(&space, &optimizationFunction);
                 double bestInd = 10e8;
-                for(size_t z = 0; z < pop.size(); ++z) {
+                for(size_t z = 0; z < POP; ++z) {
                     double elem = optimizationFunction.apply(pop[z]);
                     if(elem < bestInd) {
                         bestInd = elem;
                     }
+                    delete[] pop[z];
                 }
+                delete[] pop;
 
                 cout << bestInd << endl;
                 auto end = get_time::now();
                 auto diff = end - start;
                 file  << chrono::duration_cast<ns>(diff).count() << " ";
-                vector<vector<double> > result = search.solve(&space, &optimizationFunction, THREADS);
+                /*vector<vector<double> > result = search.solve(&space, &optimizationFunction, THREADS);
                 double mean = 0.0;
 
                 for(size_t i = 0; i < result.size(); ++i) {
@@ -98,9 +105,9 @@ int main() {
                 }
 
                 mean /= result.size();
-                rmean += mean;
+                rmean += mean;*/
             }
             file.close();
         }
     }
-}*/
+}
