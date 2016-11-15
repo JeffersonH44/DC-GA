@@ -71,6 +71,7 @@ T* OpenACCHAEA<T>::solve(Space<T> *space, OptimizationFunction<T> *goal) {
 
             // repair offspring
             // TODO: be careful with the in-place modification
+            #pragma acc for independent
             for(int k = 0; k < arguments; ++k) {
                 this->space->repair(offspring[k]);
             }

@@ -10,42 +10,24 @@
 #include "operators/mutations/GaussianMutator.h"
 #include "operators/xover/LinearXOver.h"
 #include "ga/HAEA/AbstractHAEA.h"
-#include "ga/HAEA/PosixHAEA.h"
-#include "ga/HAEA/OpenMPHAEA.h"
-
+#include "ga/HAEA/OpenMPIHAEA.h"
 
 using namespace std;
 using ns = chrono::microseconds;
 using get_time = chrono::steady_clock;
 
-void test();
-void test1();
+void test(int argc, char **argv);
 
-int main() {
+namespace mpi = boost::mpi;
+
+int main(int argc, char* argv[])
+{
+    test(argc, argv);
     return 0;
 }
 
-void test1() {
-    Hipercube h(-5.12, 5.12, 10000);
-    vector<double> a = h.getRandomIndividual();
-    vector<double> b = h.getRandomIndividual();
-    vector<vector<double>> inds;
-    inds.push_back(a);
-    inds.push_back(b);
-
-    GaussianMutator gaussianMutator(0.0, 0.3, 0.1);
-    LinearXOver linearXOver;
-    auto start = get_time::now();
-    for(int i = 0; i < 100; ++i) {
-        h.repair(a);
-    }
-    auto end = get_time::now();
-    auto diff = end - start;
-    cout << std::chrono::duration_cast<ns>(diff).count() << " ";
-}
-
-void test() {
-    size_t popSize[] = {50};
+void test(int argc, char **argv) {
+    size_t popSize[] = {100};
     for(int i = 0; i < 1; ++i) {
         cout << "population size: " << popSize[i] << endl;
         for(size_t j = 1; j <= 5; j += 7) {
@@ -57,8 +39,8 @@ void test() {
             size_t ITERS = 500;
             size_t POP = popSize[i];
             size_t DIM = 1000;
-            size_t THREADS = j;
-            int sampling = 3;
+            size_t THREADS = 2;
+            int sampling = 1;
 
             Hipercube space(-5.12, 5.12, DIM);
             Rastrigin optimizationFunction;
@@ -70,13 +52,15 @@ void test() {
             opers.push_back(make_shared<GaussianMutator>(0.0, 0.3, 0.1));
             opers.push_back(make_shared<LinearXOver>());
 
-            PosixHAEA<vector<double>> search(selection, opers, POP, ITERS);
+            OpenMPIHAEA<vector<double>> search(selection, opers, POP, ITERS);
             search.setThreads(THREADS);
+            search.setArgc(argc);
+            search.setArgv(argv);
 
             double rmean = 0.0;
 
             for(int k = 0; k < sampling; ++k) {
-                cout << "iter: " << k << endl;
+                cout << "sample: " << k+1 << endl;
                 auto start = get_time::now();
                 vector<vector<double>> pop = search.solve(&space, &optimizationFunction);
                 double bestInd = 10e8;
@@ -87,7 +71,7 @@ void test() {
                     }
                 }
 
-                cout << bestInd << endl;
+                cout << "best ind: " << bestInd << endl;
                 auto end = get_time::now();
                 auto diff = end - start;
                 file  << chrono::duration_cast<ns>(diff).count() << " ";

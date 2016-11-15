@@ -47,6 +47,7 @@ public:
     void ratesNormalize(std::vector<double> &operatorRates);
     size_t operatorSelect(std::vector<double> rates);
     virtual std::vector<T> solve(Space<T> *space, OptimizationFunction<T> *goal) = 0;
+
 protected:
     void initPopulation();
 };

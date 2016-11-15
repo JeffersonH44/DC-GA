@@ -1,40 +1,63 @@
 //
-// Created by jefferson on 28/10/16.
+// Created by jefferson on 14/11/16.
 //
 
-#ifndef DC_GA_OPENMPHAEA_H
-#define DC_GA_OPENMPHAEA_H
+#ifndef DC_GA_OPENMPIHAEA_H
+#define DC_GA_OPENMPIHAEA_H
+
 
 #include "AbstractHAEA.h"
-#include <omp.h>
+
+#include <cmath>
+#include <iostream>
+#include <boost/serialization/vector.hpp>
+#include <boost/mpi.hpp>
+
+namespace mpi = boost::mpi;
 
 template <class T>
-class OpenMPHAEA : public AbstractHAEA<T> {
+class OpenMPIHAEA : public AbstractHAEA<T> {
 public:
-    OpenMPHAEA(Selection<T> &selection, std::vector< std::shared_ptr<Operator<T> > > operators, size_t populationSize, size_t maxIters);
+    OpenMPIHAEA(Selection<T> &selection, std::vector< std::shared_ptr<Operator<T> > > operators, size_t populationSize, size_t maxIters);
     std::vector<T> solve(Space<T> *space, OptimizationFunction<T> *goal);
     void setThreads(size_t threads);
+    void setArgc(int argc);
+    void setArgv(char **argv);
 private:
     size_t threads;
+    int argc;
+    char **argv;
 };
 
 template <class T>
-OpenMPHAEA<T>::OpenMPHAEA(Selection<T> &selection, std::vector<std::shared_ptr<Operator<T> > > operators,
-                       size_t populationSize, size_t maxIters) : AbstractHAEA<T>(selection, operators, populationSize,
-                                                                              maxIters) {
+OpenMPIHAEA<T>::OpenMPIHAEA(Selection<T> &selection, std::vector<std::shared_ptr<Operator<T> > > operators,
+                         size_t populationSize, size_t maxIters) : AbstractHAEA<T>(selection, operators, populationSize,
+                                                                                maxIters) {
+
 }
 
 template <class T>
-std::vector<T> OpenMPHAEA<T>::solve(Space<T> *space, OptimizationFunction<T> *goal) {
+std::vector<T> OpenMPIHAEA<T>::solve(Space<T> *space, OptimizationFunction<T> *goal) {
     this->space = space;
     this->optimizationFunction = goal;
 
+    size_t tasks, iam, from, to, processSize, popSize = this->populationSize;
+
     this->initPopulation();
+
+    mpi::environment env(this->argc, this->argv);
+    mpi::communicator world;
+
+    tasks = static_cast<size_t>(world.size());
+    iam = static_cast<size_t>(world.rank());
+    processSize = popSize / tasks;
+    from = iam * processSize;
+    to = iam + 1 == tasks ? popSize : from + processSize;
 
     for(size_t i = 0; i < this->maxIters; ++i) {
         //printf("%li %li\n", from, to);
         #pragma omp parallel for num_threads(this->threads)
-        for(size_t j = 0; j < this->populationSize; ++j) {
+        for(size_t j = from; j < to; ++j) {
             T parent = this->population[j];
             double delta = this->ur.generate();
 
@@ -87,16 +110,41 @@ std::vector<T> OpenMPHAEA<T>::solve(Space<T> *space, OptimizationFunction<T> *go
 
             this->new_population[j] = child;
         }
+        //std::cout << "I am: " << iam << std::endl;
+        if(iam == 0) {
+            for(size_t j = to; j < this->populationSize; ++j) {
+                //std::cout << "receiving: " << j << std::endl;
+                world.recv(mpi::any_source, static_cast<int>(j), this->new_population[j]);
+            }
+        } else {
+            for(size_t j = from; j < to; ++j) {
+                //std::cout << "sending: " << j << std::endl;
+                world.send(0, static_cast<int>(j), this->new_population[j]);
+            }
+        }
+        world.barrier();
         this->population = this->new_population;
+        broadcast(world, this->population, 0);
         //printf("unlock \n");
     }
+
     return this->population;
 }
 
 template <class T>
-void OpenMPHAEA<T>::setThreads(size_t threads) {
+void OpenMPIHAEA<T>::setThreads(size_t threads) {
     this->threads = threads;
 }
 
+template <class T>
+void OpenMPIHAEA<T>::setArgc(int argc) {
+    this->argc = argc;
+}
 
-#endif //DC_GA_OPENMPHAEA_H
+template <class T>
+void OpenMPIHAEA<T>::setArgv(char **argv) {
+    this->argv = argv;
+}
+
+
+#endif //DC_GA_OPENMPIHAEA_H
