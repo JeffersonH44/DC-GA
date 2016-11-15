@@ -129,8 +129,8 @@ std::vector<T> OpenMPIHAEA<T>::solve(Space<T> *space, OptimizationFunction<T> *g
         //printf("unlock \n");
     }
 
+    MPI_Finalize();
     if(iam != 0) {
-        MPI_Finalize();
         exit(EXIT_SUCCESS);
     }
 
