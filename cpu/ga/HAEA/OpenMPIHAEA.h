@@ -12,6 +12,7 @@
 #include <iostream>
 #include <boost/serialization/vector.hpp>
 #include <boost/mpi.hpp>
+#include <cstdlib>
 
 namespace mpi = boost::mpi;
 
@@ -126,6 +127,11 @@ std::vector<T> OpenMPIHAEA<T>::solve(Space<T> *space, OptimizationFunction<T> *g
         this->population = this->new_population;
         broadcast(world, this->population, 0);
         //printf("unlock \n");
+    }
+
+    if(iam != 0) {
+        MPI_Finalize();
+        exit(EXIT_SUCCESS);
     }
 
     return this->population;
