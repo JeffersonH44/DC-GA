@@ -10,8 +10,8 @@
 template <class T>
 class Operator {
 public:
-    virtual T* apply(T *individuals) = 0;
-    #pragma acc routine seq
+    virtual T* apply(T *individuals, T *toReturn) = 0;
+    #pragma acc routine
     int getArguments();
 protected:
     int arguments;

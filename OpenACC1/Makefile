@@ -1,5 +1,5 @@
 CXX=pgc++
-CXXFLAGS=-fast -acc -ta=nvidia:rdc -Minfo=accel -std=c++11
+CXXFLAGS=-fast -acc -ta=nvidia:rdc -Minfo=accel -std=c++11 -lm
 CC=pgcc
 CFLAGS=-fast -acc -ta=nvidia:rdc -Minfo=accel
 CUDAC=nvcc
@@ -26,8 +26,11 @@ all: main
 clean:
 	rm -rf *.o *.ptx *.cub *.lst *.mod $(EXES)
 
-main: main.o BaseRandom.o UniformRandomIntCPU.o UniformRandomCPU.o AbstractHAEA.o GaussianRandom.o LinearXOver.o GaussianRandom.o Operator.o OptimizationFunction.o Rastrigin.o Space.o Hipercube.o Tournament.o GaussianMutator.o
+main: main.o Random.o
 	$(CXX) -o $@ $(CXXFLAGS) $^ -lstdc++ $(LDFLAGS)
+
+run:
+	optirun ./main
 
 clean:
 	rm -Rf main pgprof* *.o core

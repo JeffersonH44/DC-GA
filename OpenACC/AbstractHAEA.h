@@ -10,7 +10,6 @@
 #include <random>
 #include <memory>
 #include <pthread.h>
-#include "openacc.h"
 
 #include "UniformRandomIntCPU.h"
 #include "Space.h"
@@ -18,6 +17,7 @@
 #include "Operator.h"
 #include "UniformRandomCPU.h"
 #include "Selection.h"
+#include "Tournament.h"
 
 template <class T>
 class AbstractHAEA {

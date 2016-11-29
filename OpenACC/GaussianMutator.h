@@ -15,8 +15,11 @@
 class GaussianMutator : public Operator<double*> {
 public:
     GaussianMutator(double mean, double std, double prob, size_t dimension);
-    double** apply(double **individuals);
+
+    #pragma acc routine seq
+    double** apply(double **individuals, double **toReturn);
 private:
+    void copy(double *from, double *to);
     double prob;
     size_t dimension;
     std::random_device rd;

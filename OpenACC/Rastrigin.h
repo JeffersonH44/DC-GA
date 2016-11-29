@@ -14,6 +14,8 @@ public:
     Rastrigin(size_t dimension, bool minimize);
     Rastrigin(size_t dimension, double objective);
     Rastrigin(size_t dimension);
+
+    #pragma acc routine seq
     double apply(double* ind);
     double apply(double val);
 

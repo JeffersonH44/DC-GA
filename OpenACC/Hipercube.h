@@ -12,8 +12,12 @@
 class Hipercube : public Space<double*> {
 public:
     Hipercube(double lower, double upper, size_t dimension);
+
+    #pragma acc routine seq
     double* repair(double* val);
     double* getRandomIndividual();
+
+    #pragma acc routine seq
     size_t getDimension();
     ~Hipercube();
 private:

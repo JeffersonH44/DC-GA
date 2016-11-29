@@ -13,7 +13,9 @@
 class LinearXOver : public Operator<double*> {
 public:
     LinearXOver(size_t dimension);
-    double** apply(double **individuals);
+
+    #pragma acc routine seq
+    double** apply(double **individuals, double **toReturn);
 private:
     std::random_device rd;
     std::mt19937 eng;

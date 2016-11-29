@@ -20,7 +20,7 @@ ur(eng, lower, upper)
 double* Hipercube::repair(double *val) {
     double *ret = val;
 
-    #pragma acc parallel loop deviceptr(val)
+    #pragma acc loop vector
     for(size_t i = 0; i < this->dimension; ++i) {
         if(ret[i] < this->min[i]) {
             ret[i] = this->min[i];
