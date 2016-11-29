@@ -5,6 +5,7 @@
 #include "Hipercube.h"
 #include "Rastrigin.h"
 #include "LinearXOver.h"
+#include "GaussianMutator.h"
 
 #include <limits>
 #include <iostream>
@@ -17,6 +18,9 @@ int main() {
     double **individuals = hipercube::getRandomIndividuals(inds, dimension, -100, 100);
     double **operatorResult = hipercube::getRandomIndividuals(2, dimension, -1, 1);
 
+    // gaussian random parameters
+    double mean = 0.0, std = 0.1;
+
     // random related stuff
     int size = 200000;
     int current = 0;
@@ -26,7 +30,9 @@ int main() {
 
     #pragma acc data copy(individuals[0:inds][0:dimension], operatorResult[0:2][0:dimension]) present(randoms)
     {
-        operatorResult = linearxover::apply(individuals, operatorResult, dimension, randoms, size, current);
+        operatorResult = gaussianmutator::apply(individuals, operatorResult, dimension, 0.1,
+                                                mean, std,
+                                                randoms, size, current);
         /*#pragma acc parallel loop
         for(int i = 0; i < dimension; ++i) {
             hipercube::repair(individuals[0], low, high, dimension);
@@ -35,7 +41,7 @@ int main() {
     }
 
     for(int i = 0; i < dimension; ++i) {
-        cout << operatorResult[0][i] << endl;
+        cout << individuals[0][i] << " " << operatorResult[0][i] << endl;
     }
     cout << fitness << endl;
     return 0;
