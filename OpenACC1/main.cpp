@@ -3,6 +3,7 @@
 //
 #include "Random.h"
 #include "Hipercube.h"
+#include "Rastrigin.h"
 
 #include <limits>
 #include <iostream>
@@ -19,6 +20,7 @@ int main() {
     int current = 0;
     double *randoms = new double[size];
     rd::init(randoms, size);
+    double fitness;
 
     #pragma acc data copy(individuals[0:inds][0:dimension]) present(randoms)
     {
@@ -26,10 +28,12 @@ int main() {
         for(int i = 0; i < dimension; ++i) {
             hipercube::repair(individuals[0], low, high, dimension);
         }
+        fitness = rastrigin::apply(individuals[0], dimension);
     }
 
     for(int i = 0; i < dimension; ++i) {
         cout << individuals[0][i] << endl;
     }
+    cout << fitness << endl;
     return 0;
 }

@@ -26,7 +26,7 @@ all: main
 clean:
 	rm -rf *.o *.ptx *.cub *.lst *.mod $(EXES)
 
-main: main.o Random.o Hipercube.o
+main: main.o Random.o Hipercube.o Rastrigin.o
 	$(CXX) -o $@ $(CXXFLAGS) $^ -lstdc++ $(LDFLAGS)
 
 run:
