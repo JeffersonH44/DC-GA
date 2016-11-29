@@ -1,10 +1,10 @@
 CXX=pgc++
-CXXFLAGS=-fast -acc -ta=nvidia:rdc -Minfo=accel -std=c++11 -lm
+CXXFLAGS=-fast -acc -ta=nvidia:cc50 -Minfo=accel -std=c++11 -lm
 CC=pgcc
 CFLAGS=-fast -acc -ta=nvidia:rdc -Minfo=accel
 CUDAC=nvcc
 CUDAFLAGS=-std=c++11 -gencode arch=compute_50,code=compute_50 -Xcompiler -fopenmp -lgomp
-LDFLAGS=-Mcuda #-L$(CUDA_HOME)/lib64 -lcudart
+LDFLAGS=#-Mcuda #-L$(CUDA_HOME)/lib64 -lcudart
 GXX=g++
 GXXFLAGS=-std=c++11 -g
 
@@ -26,7 +26,7 @@ all: main
 clean:
 	rm -rf *.o *.ptx *.cub *.lst *.mod $(EXES)
 
-main: main.o Random.o Hipercube.o Rastrigin.o LinearXOver.o GaussianMutator.o
+main: Rastrigin.o Random.o Hipercube.o LinearXOver.o GaussianMutator.o Tournament.o main.o
 	$(CXX) -o $@ $(CXXFLAGS) $^ -lstdc++ $(LDFLAGS)
 
 run:

@@ -35,3 +35,7 @@ double rd::randomCPU(double min, double max) {
     double f = (double)rand() / RAND_MAX;
     return min + f * (max - min);
 }
+
+int rd::randomInt(int min, int max, double *randoms, int size, int &current) {
+    return min + ((int) generateRandom(randoms, size, current) % (max - min + 1));
+}

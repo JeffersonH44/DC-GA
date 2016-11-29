@@ -19,6 +19,9 @@ namespace rd {
     double random(double fMin, double fMax, double *randoms, int size, int &current);
 
     #pragma acc routine seq
+    int randomInt(int min, int max, double *randoms, int size, int &current);
+
+    #pragma acc routine seq
     double gaussianRandom(double mean, double std, double *randoms, int size, int &current);
 
     double randomCPU(double min, double max);
